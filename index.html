@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bordignon Engenharia & Gestão</title>
+<meta name="description" content="Gestão e acompanhamento de obras e reformas com planejamento, transparência e segurança. São Paulo e Baixada Santista.">
+<link rel="icon" href="img/logo-vertical.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --navy:#0c1d36;--navy2:#132a4a;--deep:#07121f;
+ --ivory:#f8f5ef;--sand:#efe9de;--line:#e2d9c8;
+ --gold:#b98a3e;--gold-l:#e6c98b;--gold-d:#7a531c;
+ --goldgrad:linear-gradient(120deg,#7a531c 0%,#c99a4f 35%,#f0d9a1 50%,#c99a4f 65%,#7a531c 100%);
+ --ink:#14202f;--mut:#667180;
+ --serif:'Cormorant Garamond',Georgia,serif;--sans:Montserrat,system-ui,sans-serif;
+ --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font:400 16px/1.75 var(--sans);color:var(--ink);background:var(--ivory);overflow-x:hidden}
+body.loading{overflow:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+section{position:relative;padding:140px 0;scroll-margin-top:84px}
+
+/* ---------- tipografia ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:14px;font:600 11px var(--sans);letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.eyebrow::before{content:"";width:42px;height:1px;background:var(--gold)}
+.title{font:500 clamp(38px,5vw,68px)/1.05 var(--serif);color:var(--navy);letter-spacing:-.01em;margin:22px 0 26px}
+.title em{font-style:italic;background:var(--goldgrad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:200% center}}
+.lead{font-weight:300;font-size:18px;color:var(--mut);max-width:620px}
+.dark .title{color:#fff}.dark .lead{color:#a9b5c6}
+
+/* ---------- botões ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;gap:12px;padding:18px 34px;font:600 12px var(--sans);letter-spacing:.2em;text-transform:uppercase;overflow:hidden;transition:color .5s var(--ease);isolation:isolate;cursor:pointer;border:0}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;transform:scaleX(0);transform-origin:right;transition:transform .6s var(--ease)}
+.btn:hover::before{transform:scaleX(1);transform-origin:left}
+.btn .arr{transition:transform .5s var(--ease)}
+.btn:hover .arr{transform:translateX(6px)}
+.btn-gold{background:var(--goldgrad);background-size:200% auto;color:var(--deep)}
+.btn-gold::before{background:var(--navy)}
+.btn-gold:hover{color:var(--gold-l)}
+.btn-ghost{border:1px solid rgba(230,201,139,.5);color:#fff}
+.btn-ghost::before{background:var(--gold-l)}
+.btn-ghost:hover{color:var(--deep)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy::before{background:var(--gold)}
+
+/* ---------- preloader ---------- */
+#loader{position:fixed;inset:0;z-index:999;background:var(--ivory);display:grid;place-items:center;transition:transform 1.1s var(--ease) .1s}
+#loader.done{transform:translateY(-100%)}
+#loader .in{display:grid;justify-items:center;gap:30px}
+#loader img{width:min(260px,60vw);opacity:0;transform:translateY(16px) scale(.96);animation:lIn 1.2s var(--ease) .15s forwards}
+#loader .bar{width:180px;height:1px;background:var(--line);position:relative;overflow:hidden}
+#loader .bar i{position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;animation:bar 1.4s var(--ease) .3s forwards}
+@keyframes lIn{to{opacity:1;transform:none}}
+@keyframes bar{to{transform:scaleX(1)}}
+
+/* ---------- progresso de rolagem ---------- */
+#progress{position:fixed;top:0;left:0;height:2px;width:100%;z-index:120;background:var(--goldgrad);transform:scaleX(0);transform-origin:left}
+
+/* ---------- header ---------- */
+header{position:fixed;inset:0 0 auto;z-index:100;background:rgba(248,245,239,.94);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:.5s var(--ease)}
+header.scrolled{border-color:var(--line);box-shadow:0 10px 40px -20px rgba(12,29,54,.25)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:96px;transition:height .5s var(--ease)}
+header.scrolled .nav{height:76px}
+.brand img{height:84px;width:auto;transition:height .5s var(--ease)}
+header.scrolled .brand img{height:66px}
+.menu{display:flex;align-items:center;gap:34px}
+.menu a:not(.btn){position:relative;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--navy)}
+.menu a:not(.btn)::after{content:"";position:absolute;left:0;bottom:-6px;width:100%;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
+.menu a:not(.btn):hover::after,.menu a.active::after{transform:scaleX(1);transform-origin:left}
+.menu .btn{padding:14px 24px;font-size:11px}
+.burger{display:none;width:44px;height:44px;background:none;border:0;cursor:pointer;position:relative}
+.burger span{position:absolute;left:10px;right:10px;height:1.5px;background:var(--navy);transition:.4s var(--ease)}
+.burger span:nth-child(1){top:16px}.burger span:nth-child(2){top:27px}
+.burger.x span:nth-child(1){top:21px;transform:rotate(45deg)}
+.burger.x span:nth-child(2){top:21px;transform:rotate(-45deg)}
+
+/* ---------- hero ---------- */
+.hero{min-height:100vh;padding:200px 0 120px;background:radial-gradient(900px 600px at 85% 20%,#1b3a64 0%,transparent 60%),linear-gradient(170deg,var(--navy) 0%,var(--deep) 100%);color:#fff;overflow:hidden;display:flex;align-items:center}
+.blueprint{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.blueprint .g{stroke:rgba(230,201,139,.08);stroke-width:1}
+.blueprint .d{fill:none;stroke:url(#gg);stroke-width:1.2;stroke-dasharray:1600;stroke-dashoffset:1600}
+.go .blueprint .d{animation:draw 3.2s var(--ease) forwards}
+.blueprint .d.dash{stroke-dasharray:6 8;stroke-dashoffset:0;opacity:0}
+.go .blueprint .d.dash{animation:fadeIn 2s ease 1.6s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadeIn{to{opacity:.8}}
+.hero .wrap{position:relative;width:100%}
+.hero .eyebrow{opacity:0;transform:translateY(14px);transition:1s var(--ease) .2s}
+.go .hero .eyebrow{opacity:1;transform:none}
+.hero h1{font:500 clamp(46px,7.4vw,108px)/.98 var(--serif);letter-spacing:-.02em;margin:30px 0 34px;max-width:1000px}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
+.hero h1 .w>span{display:inline-block;transform:translateY(110%);transition:transform 1.3s var(--ease)}
+.go .hero h1 .w>span{transform:none}
+.hero h1 em{font-style:italic;background:var(--goldgrad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+.hero p{font-weight:300;font-size:19px;color:#b6c2d3;max-width:560px;opacity:0;transform:translateY(20px);transition:1.2s var(--ease) 1s}
+.hero .cta{display:flex;flex-wrap:wrap;gap:16px;margin-top:46px;opacity:0;transform:translateY(20px);transition:1.2s var(--ease) 1.2s}
+.go .hero p,.go .hero .cta{opacity:1;transform:none}
+.scroll{position:absolute;left:max(32px,calc((100vw - 1240px)/2 + 32px));bottom:36px;display:flex;align-items:center;gap:14px;font:500 10px var(--sans);letter-spacing:.3em;text-transform:uppercase;color:#7f8ea4}
+.scroll i{width:1px;height:56px;background:rgba(255,255,255,.15);position:relative;overflow:hidden}
+.scroll i::after{content:"";position:absolute;left:0;top:-50%;width:1px;height:50%;background:var(--gold-l);animation:drop 2.2s var(--ease) infinite}
+@keyframes drop{to{top:100%}}
+.side{position:absolute;right:32px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right center;font:500 10px var(--sans);letter-spacing:.4em;text-transform:uppercase;color:rgba(255,255,255,.25);white-space:nowrap}
+
+/* ---------- faixa de números ---------- */
+.stats{background:var(--navy);padding:0;border-top:1px solid rgba(230,201,139,.15)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:56px 28px;border-right:1px solid rgba(230,201,139,.12);text-align:center}
+.stat:last-child{border-right:0}
+.stat b{display:block;font:500 64px/1 var(--serif);background:var(--goldgrad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{display:block;margin-top:12px;font:500 11px var(--sans);letter-spacing:.22em;text-transform:uppercase;color:#8e9db2}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(46px);transition:opacity 1.2s var(--ease),transform 1.2s var(--ease)}
+.rv.l{transform:translateX(-50px)}.rv.r{transform:translateX(50px)}
+.rv.in{opacity:1;transform:none}
+.mask{position:relative;overflow:hidden}
+.mask::after{content:"";position:absolute;inset:0;background:var(--navy);transform-origin:right;transition:transform 1.4s var(--ease)}
+.mask.in::after{transform:scaleX(0)}
+
+/* ---------- sobre ---------- */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
+.about .visual{position:relative;aspect-ratio:4/5}
+.frame{position:absolute;inset:0;background:linear-gradient(160deg,var(--navy2),var(--deep));overflow:hidden}
+.frame svg{position:absolute;inset:0;width:100%;height:100%}
+.frame .plabel{position:absolute;left:28px;bottom:24px;font:500 10px var(--sans);letter-spacing:.3em;text-transform:uppercase;color:rgba(230,201,139,.6)}
+.about .visual::before{content:"";position:absolute;inset:-22px 22px 22px -22px;border:1px solid var(--gold);z-index:-1}
+.badge{position:absolute;right:-40px;bottom:50px;background:var(--ivory);padding:30px 34px;box-shadow:0 30px 60px -30px rgba(12,29,54,.4);border-left:2px solid var(--gold)}
+.badge b{font:500 50px/1 var(--serif);color:var(--navy)}
+.badge span{display:block;margin-top:6px;font:500 10px var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+.feats{list-style:none;margin:40px 0 0;display:grid;gap:0;border-top:1px solid var(--line)}
+.feats li{display:flex;gap:22px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line);font-size:16px;transition:padding .5s var(--ease)}
+.feats li:hover{padding-left:12px}
+.feats li small{font:500 italic 20px var(--serif);color:var(--gold)}
+
+/* ---------- marquee ---------- */
+.marq{background:var(--sand);padding:34px 0;overflow:hidden;border-block:1px solid var(--line)}
+.marq .track{display:flex;width:max-content;animation:marq 40s linear infinite}
+.marq span{font:400 italic clamp(28px,3.4vw,46px)/1 var(--serif);color:var(--navy);padding:0 34px;white-space:nowrap;display:flex;align-items:center;gap:68px}
+.marq span::after{content:"✦";font-style:normal;font-size:18px;color:var(--gold)}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* ---------- serviços ---------- */
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:70px}
+.svc{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.card{position:relative;padding:52px 42px 56px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ivory);overflow:hidden;transition:color .6s var(--ease)}
+.card::before{content:"";position:absolute;inset:0;background:var(--navy);transform:translateY(101%);transition:transform .8s var(--ease);z-index:0}
+.card:hover::before{transform:none}
+.card>*{position:relative;z-index:1}
+.card .num{font:400 italic 20px var(--serif);color:var(--gold)}
+.card svg{width:46px;height:46px;stroke:var(--gold);fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;margin:30px 0 26px;transition:transform .8s var(--ease)}
+.card:hover svg{transform:translateY(-6px) rotate(-4deg)}
+.card h3{font:500 28px/1.15 var(--serif);color:var(--navy);margin-bottom:14px;transition:color .6s}
+.card p{color:var(--mut);font-size:15px;font-weight:300;transition:color .6s}
+.card:hover h3{color:#fff}.card:hover p{color:#a9b5c6}
+.card .more{display:inline-block;margin-top:26px;font:600 10px var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--gold);opacity:0;transform:translateY(10px);transition:.6s var(--ease)}
+.card:hover .more{opacity:1;transform:none}
+
+/* ---------- processo ---------- */
+.process{background:linear-gradient(170deg,var(--navy),var(--deep));color:#fff;overflow:hidden}
+.process .bgB{position:absolute;right:-6%;top:50%;transform:translateY(-50%);font:500 clamp(300px,42vw,620px)/1 var(--serif);color:rgba(230,201,139,.035);pointer-events:none;user-select:none}
+.steps{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;margin-top:90px}
+.rail{position:absolute;left:0;right:0;top:34px;height:1px;background:rgba(255,255,255,.1)}
+.rail i{position:absolute;inset:0;background:var(--goldgrad);transform:scaleX(0);transform-origin:left;transition:transform 2.4s var(--ease)}
+.steps.in .rail i{transform:scaleX(1)}
+.step .dot{width:68px;height:68px;border-radius:50%;border:1px solid rgba(230,201,139,.4);background:var(--navy);display:grid;place-items:center;font:500 italic 26px var(--serif);color:var(--gold-l);position:relative;margin-bottom:34px;transition:.6s var(--ease)}
+.step:hover .dot{background:var(--gold);color:var(--deep);border-color:var(--gold)}
+.step h3{font:500 30px var(--serif);margin-bottom:12px}
+.step p{color:#9fadc1;font-weight:300;font-size:15px}
+
+/* ---------- erros ---------- */
+.errs{display:grid;grid-template-columns:1fr 1.25fr;gap:100px;align-items:start}
+.errs .sticky{position:sticky;top:140px}
+.err{display:grid;grid-template-columns:90px 1fr;gap:20px;padding:42px 0;border-bottom:1px solid var(--line)}
+.err:first-child{border-top:1px solid var(--line)}
+.err .n{font:400 72px/0.9 var(--serif);color:transparent;-webkit-text-stroke:1px var(--gold)}
+.err h3{font:500 30px/1.2 var(--serif);color:var(--navy);margin-bottom:8px}
+.err p{color:var(--mut);font-weight:300}
+
+/* ---------- obras ---------- */
+.works{background:var(--sand)}
+.featured{display:grid;grid-template-columns:1.5fr 1fr;min-height:540px;margin-bottom:24px}
+.ph{position:relative;overflow:hidden;background:linear-gradient(150deg,#1a375f,var(--deep))}
+.ph .bg{position:absolute;inset:0;transition:transform 1.6s var(--ease);background:repeating-linear-gradient(90deg,transparent 0 59px,rgba(230,201,139,.06) 59px 60px),repeating-linear-gradient(0deg,transparent 0 59px,rgba(230,201,139,.06) 59px 60px)}
+.ph:hover .bg{transform:scale(1.08)}
+.ph .lbl{position:absolute;left:28px;bottom:26px;font:500 10px var(--sans);letter-spacing:.3em;text-transform:uppercase;color:rgba(230,201,139,.7)}
+.ph .ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:30px;background:linear-gradient(0deg,rgba(7,18,31,.9),transparent 60%);opacity:0;transition:opacity .7s var(--ease)}
+.ph:hover .ov{opacity:1}
+.ph .ov h4{font:500 28px var(--serif);color:#fff;transform:translateY(16px);transition:transform .7s var(--ease)}
+.ph:hover .ov h4{transform:none}
+.ph .ov span{font:500 10px var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--gold-l)}
+.featured .txt{background:var(--ivory);padding:64px 56px;display:flex;flex-direction:column;justify-content:center}
+.featured .txt h3{font:500 48px/1.05 var(--serif);color:var(--navy);margin:18px 0 10px}
+.featured .txt .loc{font:500 11px var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.featured .txt p{color:var(--mut);font-weight:300;margin:16px 0 34px}
+.filters{display:flex;flex-wrap:wrap;gap:28px;margin:60px 0 34px}
+.filters button{background:none;border:0;cursor:pointer;font:500 12px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--mut);padding-bottom:8px;position:relative}
+.filters button::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--gold);transform:scaleX(0);transition:transform .5s var(--ease)}
+.filters button.on{color:var(--navy)}.filters button.on::after{transform:scaleX(1)}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:300px;gap:24px}
+.gal .ph{transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.gal .ph.tall{grid-row:span 2}
+.gal .ph.wide{grid-column:span 2}
+.gal .ph.hide{opacity:.12;transform:scale(.97);pointer-events:none}
+
+/* ---------- faq ---------- */
+.faq{display:grid;grid-template-columns:1fr 1.4fr;gap:100px}
+.q{border-bottom:1px solid var(--line)}
+.q:first-child{border-top:1px solid var(--line)}
+.q button{width:100%;background:none;border:0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:30px 0;text-align:left;font:500 24px/1.3 var(--serif);color:var(--navy);transition:color .4s}
+.q button:hover{color:var(--gold)}
+.q .pm{flex:none;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;position:relative;transition:.5s var(--ease)}
+.q .pm::before,.q .pm::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1px;background:var(--gold);transform:translate(-50%,-50%);transition:.5s var(--ease)}
+.q .pm::after{transform:translate(-50%,-50%) rotate(90deg)}
+.q.open .pm{background:var(--navy);border-color:var(--navy)}
+.q.open .pm::after{transform:translate(-50%,-50%) rotate(0)}
+.q .a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--ease)}
+.q.open .a{grid-template-rows:1fr}
+.q .a>div{overflow:hidden}
+.q .a p{padding:0 60px 30px 0;color:var(--mut);font-weight:300}
+
+/* ---------- contato ---------- */
+.contact{background:linear-gradient(170deg,var(--navy),var(--deep));color:#fff;overflow:hidden}
+.contact .grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start}
+.ci{display:flex;align-items:center;gap:22px;padding:24px 0;border-bottom:1px solid rgba(255,255,255,.08);transition:padding .5s var(--ease)}
+.ci:hover{padding-left:12px}
+.ci .ic{width:52px;height:52px;border:1px solid rgba(230,201,139,.35);display:grid;place-items:center;transition:.5s var(--ease)}
+.ci:hover .ic{background:var(--gold);border-color:var(--gold)}
+.ci .ic svg{width:20px;height:20px;stroke:var(--gold-l);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:.5s}
+.ci:hover .ic svg{stroke:var(--deep)}
+.ci small{display:block;font:500 10px var(--sans);letter-spacing:.26em;text-transform:uppercase;color:#7f8ea4}
+.ci b{font:500 24px var(--serif);color:#fff}
+.cinfo{margin-top:44px;border-top:1px solid rgba(255,255,255,.08)}
+form{background:rgba(255,255,255,.03);border:1px solid rgba(230,201,139,.18);padding:54px 48px}
+form h3{font:500 34px var(--serif);margin-bottom:8px}
+form>p{color:#8e9db2;font-weight:300;font-size:15px;margin-bottom:26px}
+.fld{position:relative;margin-bottom:26px}
+.fld input,.fld select,.fld textarea{width:100%;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.18);padding:16px 0 10px;color:#fff;font:300 16px var(--sans);outline:none;transition:border-color .4s}
+.fld textarea{min-height:90px;resize:vertical}
+.fld select{appearance:none;cursor:pointer}
+.fld select option{color:#000}
+.fld label{position:absolute;left:0;top:16px;font:400 14px var(--sans);color:#7f8ea4;pointer-events:none;transition:.4s var(--ease)}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--gold)}
+.fld input:focus+label,.fld input:not(:placeholder-shown)+label,.fld textarea:focus+label,.fld textarea:not(:placeholder-shown)+label,.fld select+label{top:-8px;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-l)}
+form .btn{width:100%;justify-content:center;margin-top:10px}
+
+/* ---------- footer ---------- */
+footer{background:var(--ivory);padding:90px 0 40px;border-top:1px solid var(--line)}
+.ftop{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:60px;align-items:start;padding-bottom:60px;border-bottom:1px solid var(--line)}
+.ftop img{width:320px;height:auto}
+.ftop h5{font:600 11px var(--sans);letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.ftop ul{list-style:none;display:grid;gap:10px}
+.ftop li a{color:var(--mut);transition:color .3s}
+.ftop li a:hover{color:var(--navy)}
+.slogan{font:400 italic 28px/1.3 var(--serif);color:var(--navy);margin-top:6px}
+.fbot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-top:30px;font-size:13px;color:var(--mut)}
+.top{cursor:pointer;display:inline-flex;align-items:center;gap:10px;font:600 11px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--navy);background:none;border:0}
+
+/* whatsapp */
+.wa{position:fixed;right:28px;bottom:28px;z-index:90;width:60px;height:60px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 14px 30px -10px rgba(0,0,0,.4);transform:scale(0);transition:transform .6s var(--ease)}
+.wa.show{transform:scale(1)}
+.wa::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #25d366;animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{from{transform:scale(1);opacity:.7}to{transform:scale(1.6);opacity:0}}
+.wa svg{width:30px;height:30px;fill:#fff}
+
+/* ---------- responsivo ---------- */
+@media(max-width:1080px){
+ .menu{position:fixed;inset:76px 0 auto;flex-direction:column;align-items:flex-start;background:var(--ivory);padding:30px 32px 40px;gap:24px;border-bottom:1px solid var(--line);clip-path:inset(0 0 100% 0);transition:clip-path .7s var(--ease)}
+ .menu.open{clip-path:inset(0 0 0 0)}
+ .burger{display:block}
+ .nav,header.scrolled .nav{height:76px}
+ .brand img,header.scrolled .brand img{height:60px}
+ .about,.errs,.faq,.contact .grid,.featured{grid-template-columns:1fr;gap:60px}
+ .errs .sticky{position:static}
+ .svc{grid-template-columns:1fr 1fr}
+ .steps{grid-template-columns:1fr 1fr;gap:50px 40px}.rail{display:none}
+ .badge{right:20px}
+ .head{flex-direction:column;align-items:flex-start}
+ .ftop{grid-template-columns:1fr 1fr}
+ .side{display:none}
+}
+@media(max-width:680px){
+ .wrap{padding:0 22px}
+ section{padding:96px 0}
+ .hero{padding:150px 0 110px}
+ .stats .wrap{grid-template-columns:1fr 1fr}
+ .stat{border-bottom:1px solid rgba(230,201,139,.12);padding:40px 12px}
+ .stat b{font-size:48px}
+ .svc,.steps,.gal,.ftop{grid-template-columns:1fr}
+ .gal .ph.tall{grid-row:span 1}.gal .ph.wide{grid-column:span 1}
+ .featured .txt{padding:44px 30px}
+ form{padding:40px 26px}
+ .err{grid-template-columns:64px 1fr}.err .n{font-size:54px}
+ .scroll{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important}
+ .rv,.hero h1 .w>span,.hero p,.hero .cta,.hero .eyebrow{opacity:1!important;transform:none!important}
+ .mask::after{display:none}
+}
+</style>
+</head>
+<body class="loading">
+
+<div id="loader"><div class="in"><img src="img/logo-vertical.png" alt="Bordignon Engenharia & Gestão"><div class="bar"><i></i></div></div></div>
+<div id="progress"></div>
+
+<header id="hdr">
+ <div class="wrap nav">
+  <a href="#inicio" class="brand"><img src="img/logo-horizontal.png" alt="Bordignon Engenharia & Gestão"></a>
+  <nav class="menu" id="menu">
+   <a href="#sobre">Sobre</a>
+   <a href="#servicos">Serviços</a>
+   <a href="#processo">Como trabalhamos</a>
+   <a href="#obras">Obras</a>
+   <a href="#duvidas">Dúvidas</a>
+   <a href="#contato">Contato</a>
+   <a class="btn btn-navy" href="https://wa.me/5511947257804?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener">Orçamento</a>
+  </nav>
+  <button class="burger" id="burger" aria-label="Abrir menu"><span></span><span></span></button>
+ </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+ <svg class="blueprint" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#7a531c"/><stop offset=".5" stop-color="#f0d9a1"/><stop offset="1" stop-color="#b98a3e"/></linearGradient></defs>
+  <g class="g">
+   <line x1="0" y1="180" x2="1440" y2="180"/><line x1="0" y1="360" x2="1440" y2="360"/><line x1="0" y1="540" x2="1440" y2="540"/><line x1="0" y1="720" x2="1440" y2="720"/>
+   <line x1="240" y1="0" x2="240" y2="900"/><line x1="480" y1="0" x2="480" y2="900"/><line x1="720" y1="0" x2="720" y2="900"/><line x1="960" y1="0" x2="960" y2="900"/><line x1="1200" y1="0" x2="1200" y2="900"/>
+  </g>
+  <path class="d" d="M1000 820 V300 L1120 220 V820"/>
+  <path class="d" d="M1140 820 V250 L1260 330 V820"/>
+  <path class="d" d="M940 820 H1360"/>
+  <path class="d" d="M1060 140 V860 M960 380 H1300 M920 700 H1320"/>
+  <circle class="d dash" cx="1130" cy="500" r="260"/>
+ </svg>
+ <div class="wrap">
+  <span class="eyebrow">Engenharia & Gestão de Obras</span>
+  <h1>
+   <span class="w"><span>Sua</span></span> <span class="w"><span>obra</span></span> <span class="w"><span>com</span></span><br>
+   <span class="w"><span><em>planejamento,</em></span></span><br>
+   <span class="w"><span>transparência</span></span> <span class="w"><span>e</span></span> <span class="w"><span><em>segurança</em></span></span>
+  </h1>
+  <p>Você participa das decisões e acompanha cada etapa — do primeiro orçamento à entrega das chaves.</p>
+  <div class="cta">
+   <a class="btn btn-gold" href="https://wa.me/5511947257804?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener">Solicitar orçamento <span class="arr">→</span></a>
+   <a class="btn btn-ghost" href="#servicos">Conheça os serviços</a>
+  </div>
+ </div>
+ <div class="scroll"><i></i>Role para descobrir</div>
+ <div class="side">São Paulo · Baixada Santista</div>
+</section>
+
+<!-- NÚMEROS -->
+<section class="stats">
+ <div class="wrap">
+  <div class="stat rv"><b data-count="100" data-suf="%">0</b><span>Etapas acompanhadas</span></div>
+  <div class="stat rv"><b data-count="6">0</b><span>Áreas de atuação</span></div>
+  <div class="stat rv"><b data-count="4">0</b><span>Etapas de método</span></div>
+  <div class="stat rv"><b data-count="1" data-pre="">0</b><span>Responsável técnico do início ao fim</span></div>
+ </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre">
+ <div class="wrap about">
+  <div class="visual rv l">
+   <div class="frame mask">
+    <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+     <g stroke="rgba(230,201,139,.09)"><path d="M0 100H400M0 200H400M0 300H400M0 400H400M100 0V500M200 0V500M300 0V500"/></g>
+     <g fill="none" stroke="#c99a4f" stroke-width="1" opacity=".7"><path d="M120 440V200L200 150V440M210 440V170L290 220V440M90 440H320"/><circle cx="205" cy="300" r="150" stroke-dasharray="5 7" opacity=".6"/></g>
+    </svg>
+    <span class="plabel">Foto da equipe / obra</span>
+   </div>
+   <div class="badge rv"><b>100%</b><span>das etapas acompanhadas</span></div>
+  </div>
+  <div class="rv r">
+   <span class="eyebrow">Quem somos</span>
+   <h2 class="title">Engenharia que coloca <em>você</em> no controle da obra</h2>
+   <p class="lead">A Bordignon nasceu para acabar com a obra que estoura prazo, orçamento e paciência. Unimos o rigor técnico da engenharia a uma gestão próxima e transparente.</p>
+   <ul class="feats">
+    <li><small>i.</small>Responsável técnico acompanhando do início ao fim</li>
+    <li><small>ii.</small>Relatórios periódicos com fotos do andamento</li>
+    <li><small>iii.</small>Você aprova todas as decisões importantes</li>
+    <li><small>iv.</small>Controle rigoroso de orçamento e cronograma</li>
+   </ul>
+  </div>
+ </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marq" aria-hidden="true"><div class="track" id="track">
+ <span>Gestão de obras</span><span>Planejamento</span><span>Controle de custos</span><span>Reformas</span><span>Vistorias</span><span>Compatibilização de projetos</span>
+</div></div>
+
+<!-- SERVIÇOS -->
+<section id="servicos">
+ <div class="wrap">
+  <div class="head">
+   <div class="rv"><span class="eyebrow">Serviços</span><h2 class="title" style="margin-bottom:0">Soluções completas, <em>do papel à entrega</em></h2></div>
+   <p class="lead rv">Cada serviço pode ser contratado separadamente ou como gestão completa da sua obra.</p>
+  </div>
+  <div class="svc">
+   <article class="card rv"><span class="num">01</span><svg viewBox="0 0 48 48"><path d="M6 42h36M10 42V18l14-10 14 10v24M19 42V30h10v12"/></svg><h3>Gestão e acompanhamento de obras</h3><p>Coordenação diária de equipes, fornecedores e qualidade de execução.</p><span class="more">Saiba mais →</span></article>
+   <article class="card rv"><span class="num">02</span><svg viewBox="0 0 48 48"><rect x="7" y="9" width="34" height="32" rx="2"/><path d="M7 18h34M16 5v8M32 5v8M15 27h8M15 33h14"/></svg><h3>Planejamento e cronograma</h3><p>Etapas, prazos e sequência de serviços definidos com clareza antes do início.</p><span class="more">Saiba mais →</span></article>
+   <article class="card rv"><span class="num">03</span><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17"/><path d="M24 12v24M30 17h-8.5a4 4 0 0 0 0 8h5a4 4 0 0 1 0 8H17"/></svg><h3>Orçamento e controle de custos</h3><p>Orçamento detalhado e acompanhamento de cada real investido.</p><span class="more">Saiba mais →</span></article>
+   <article class="card rv"><span class="num">04</span><svg viewBox="0 0 48 48"><path d="M29 12a8 8 0 0 0-10.8 10.8L7 34l6 6 11.2-11.2A8 8 0 0 0 35 18l-5 5-4.8-1.2L24 17z"/></svg><h3>Reformas residenciais e comerciais</h3><p>Apartamentos, casas, lojas e escritórios — de pequenas intervenções a reformas completas.</p><span class="more">Saiba mais →</span></article>
+   <article class="card rv"><span class="num">05</span><svg viewBox="0 0 48 48"><circle cx="21" cy="21" r="13"/><path d="m42 42-11.5-11.5M15 21l4 4 8-8"/></svg><h3>Fiscalização e vistorias</h3><p>Verificação técnica da execução, recebimento de obra e laudos de vistoria.</p><span class="more">Saiba mais →</span></article>
+   <article class="card rv"><span class="num">06</span><svg viewBox="0 0 48 48"><path d="M24 5 5 14l19 9 19-9-19-9zM5 34l19 9 19-9M5 24l19 9 19-9"/></svg><h3>Compatibilização de projetos</h3><p>Arquitetura, elétrica, hidráulica e marcenaria conversando entre si.</p><span class="more">Saiba mais →</span></article>
+  </div>
+ </div>
+</section>
+
+<!-- PROCESSO -->
+<section class="process dark" id="processo">
+ <div class="bgB" aria-hidden="true">B</div>
+ <div class="wrap">
+  <span class="eyebrow rv">Como trabalhamos</span>
+  <h2 class="title rv">Um método claro, <em>em quatro etapas</em></h2>
+  <p class="lead rv">Você sabe exatamente o que acontece em cada fase da obra.</p>
+  <div class="steps" id="steps">
+   <div class="rail"><i></i></div>
+   <div class="step rv"><div class="dot">i</div><h3>Diagnóstico</h3><p>Visita técnica para entender objetivo, orçamento disponível e prazo.</p></div>
+   <div class="step rv"><div class="dot">ii</div><h3>Planejamento</h3><p>Escopo, cronograma, orçamento detalhado e fornecedores — tudo aprovado por você.</p></div>
+   <div class="step rv"><div class="dot">iii</div><h3>Execução</h3><p>Gestão diária com relatórios, fotos e reuniões de alinhamento.</p></div>
+   <div class="step rv"><div class="dot">iv</div><h3>Entrega</h3><p>Vistoria final, checklist de qualidade e entrega documentada.</p></div>
+  </div>
+ </div>
+</section>
+
+<!-- ERROS -->
+<section>
+ <div class="wrap errs">
+  <div class="sticky rv">
+   <span class="eyebrow">Fique atento</span>
+   <h2 class="title">4 erros que <em>encarecem</em> qualquer obra</h2>
+   <p class="lead">A maior parte dos prejuízos nasce de decisões tomadas antes do primeiro tijolo.</p>
+   <a class="btn btn-navy" style="margin-top:40px" href="https://wa.me/5511947257804?text=Ol%C3%A1!%20Quero%20falar%20sobre%20acompanhamento%20t%C3%A9cnico." target="_blank" rel="noopener">Falar com um engenheiro <span class="arr">→</span></a>
+  </div>
+  <div>
+   <div class="err rv"><span class="n">01</span><div><h3>Começar sem planejamento</h3><p>Sem escopo e cronograma definidos, cada imprevisto vira custo extra.</p></div></div>
+   <div class="err rv"><span class="n">02</span><div><h3>Não controlar o orçamento</h3><p>Pequenos gastos não registrados somam e estouram o valor previsto.</p></div></div>
+   <div class="err rv"><span class="n">03</span><div><h3>Escolher só pelo menor preço</h3><p>O mais barato costuma sair caro com retrabalho e materiais inadequados.</p></div></div>
+   <div class="err rv"><span class="n">04</span><div><h3>Obra sem acompanhamento técnico</h3><p>Sem fiscalização, as falhas só aparecem quando já é tarde para corrigir.</p></div></div>
+  </div>
+ </div>
+</section>
+
+<!-- OBRAS -->
+<section class="works" id="obras">
+ <div class="wrap">
+  <div class="head">
+   <div class="rv"><span class="eyebrow">Portfólio</span><h2 class="title" style="margin-bottom:0">Obras que <em>falam por nós</em></h2></div>
+  </div>
+  <div class="featured rv">
+   <div class="ph mask"><div class="bg"></div><span class="lbl">Foto do projeto em destaque</span></div>
+   <div class="txt">
+    <span class="loc">Santos · SP</span>
+    <h3>Projeto EG-97</h3>
+    <p>Espaço reservado para a descrição do projeto: escopo, prazo e principais desafios.</p>
+    <a class="btn btn-navy" href="#contato" style="align-self:flex-start">Quero um projeto assim <span class="arr">→</span></a>
+   </div>
+  </div>
+  <div class="filters rv" id="filters">
+   <button class="on" data-f="all">Todas</button><button data-f="interiores">Interiores</button><button data-f="cozinha">Cozinha</button><button data-f="residencial">Residencial</button><button data-f="estrutura">Estrutura</button><button data-f="instalacoes">Instalações</button><button data-f="gestao">Gestão</button>
+  </div>
+  <div class="gal" id="gal">
+   <div class="ph rv tall" data-c="interiores"><div class="bg"></div><span class="lbl">Interiores</span><div class="ov"><span>Interiores</span><h4>Nome do projeto</h4></div></div>
+   <div class="ph rv" data-c="cozinha"><div class="bg"></div><span class="lbl">Cozinha</span><div class="ov"><span>Cozinha</span><h4>Nome do projeto</h4></div></div>
+   <div class="ph rv" data-c="residencial"><div class="bg"></div><span class="lbl">Residencial</span><div class="ov"><span>Residencial</span><h4>Nome do projeto</h4></div></div>
+   <div class="ph rv" data-c="estrutura"><div class="bg"></div><span class="lbl">Estrutura</span><div class="ov"><span>Estrutura</span><h4>Nome do projeto</h4></div></div>
+   <div class="ph rv tall" data-c="instalacoes"><div class="bg"></div><span class="lbl">Instalações</span><div class="ov"><span>Instalações</span><h4>Nome do projeto</h4></div></div>
+   <div class="ph rv wide" data-c="gestao"><div class="bg"></div><span class="lbl">Gestão</span><div class="ov"><span>Gestão</span><h4>Nome do projeto</h4></div></div>
+  </div>
+ </div>
+</section>
+
+<!-- FAQ -->
+<section id="duvidas">
+ <div class="wrap faq">
+  <div class="rv">
+   <span class="eyebrow">Dúvidas frequentes</span>
+   <h2 class="title">Perguntas que <em>sempre</em> recebemos</h2>
+   <p class="lead">Não encontrou sua dúvida? Fale direto com a gente pelo WhatsApp.</p>
+  </div>
+  <div class="rv" id="faq">
+   <div class="q open"><button>Acompanhamento profissional é um luxo?<span class="pm"></span></button><div class="a"><div><p>Não. Ele evita compras erradas, retrabalho e atrasos — e normalmente se paga com a economia que gera.</p></div></div></div>
+   <div class="q"><button>Vocês atendem obras pequenas e reformas de apartamento?<span class="pm"></span></button><div class="a"><div><p>Sim. Atendemos desde reformas pontuais em apartamentos até obras residenciais e comerciais completas.</p></div></div></div>
+   <div class="q"><button>Como acompanho o andamento da obra?<span class="pm"></span></button><div class="a"><div><p>Você recebe relatórios periódicos com fotos, participa de reuniões de alinhamento e tem contato direto com o responsável técnico.</p></div></div></div>
+   <div class="q"><button>Quais regiões vocês atendem?<span class="pm"></span></button><div class="a"><div><p>São Paulo (capital e região) e Baixada Santista.</p></div></div></div>
+   <div class="q"><button>Como solicito um orçamento?<span class="pm"></span></button><div class="a"><div><p>Chame no WhatsApp ou preencha o formulário. Agendamos uma visita técnica para entender sua necessidade.</p></div></div></div>
+  </div>
+ </div>
+</section>
+
+<!-- CONTATO -->
+<section class="contact dark" id="contato">
+ <div class="wrap grid">
+  <div class="rv l">
+   <span class="eyebrow">Contato</span>
+   <h2 class="title">Vamos tirar sua obra do papel <em>do jeito certo?</em></h2>
+   <p class="lead">Atendimento em São Paulo e Baixada Santista.</p>
+   <div class="cinfo">
+    <a class="ci" href="https://wa.me/5511947257804" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-13.3 7.9L3 21l1.1-4.6A9 9 0 1 1 21 12z"/></svg></span><span><small>WhatsApp</small><b>(11) 94725-7804</b></span></a>
+    <a class="ci" href="mailto:contato@bordignon.eng.br"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg></span><span><small>E-mail</small><b>contato@bordignon.eng.br</b></span></a>
+    <a class="ci" href="https://instagram.com/bordignon.eng" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5"/></svg></span><span><small>Instagram</small><b>@bordignon.eng</b></span></a>
+   </div>
+  </div>
+  <form id="form" class="rv r">
+   <h3>Solicite seu orçamento</h3>
+   <p>Responderemos pelo WhatsApp.</p>
+   <div class="fld"><input id="nome" name="nome" placeholder=" " required><label for="nome">Seu nome</label></div>
+   <div class="fld"><input id="local" name="local" placeholder=" "><label for="local">Cidade / bairro da obra</label></div>
+   <div class="fld"><select id="tipo" name="tipo"><option>Gestão de obra</option><option>Reforma residencial</option><option>Reforma comercial</option><option>Planejamento e orçamento</option><option>Vistoria / fiscalização</option><option>Outro</option></select><label for="tipo">Tipo de serviço</label></div>
+   <div class="fld"><textarea id="msg" name="msg" placeholder=" "></textarea><label for="msg">Conte um pouco sobre a obra</label></div>
+   <button class="btn btn-gold" type="submit">Enviar pelo WhatsApp <span class="arr">→</span></button>
+  </form>
+ </div>
+</section>
+
+<footer>
+ <div class="wrap">
+  <div class="ftop">
+   <div><img src="img/logo-horizontal.png" alt="Bordignon Engenharia & Gestão"><p class="slogan">Planejar hoje é garantir<br>qualidade amanhã.</p></div>
+   <div><h5>Navegação</h5><ul><li><a href="#sobre">Sobre</a></li><li><a href="#servicos">Serviços</a></li><li><a href="#processo">Como trabalhamos</a></li><li><a href="#obras">Obras</a></li><li><a href="#duvidas">Dúvidas</a></li></ul></div>
+   <div><h5>Contato</h5><ul><li><a href="https://wa.me/5511947257804" target="_blank" rel="noopener">(11) 94725-7804</a></li><li><a href="mailto:contato@bordignon.eng.br">contato@bordignon.eng.br</a></li><li><a href="https://instagram.com/bordignon.eng" target="_blank" rel="noopener">@bordignon.eng</a></li><li>São Paulo · Baixada Santista</li></ul></div>
+  </div>
+  <div class="fbot"><span>© 2026 Bordignon Engenharia & Gestão. Todos os direitos reservados.</span><button class="top" id="toTop">Voltar ao topo ↑</button></div>
+ </div>
+</footer>
+
+<a class="wa" id="wa" href="https://wa.me/5511947257804" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 32 32"><path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.6 10.6 0 1 1 16 26.6zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8 1 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.6-.4z"/></svg></a>
+
+<script>
+(()=>{
+ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+ // preloader
+ const start=()=>{ $('#loader').classList.add('done'); document.body.classList.remove('loading'); setTimeout(()=>document.body.classList.add('go'),350); };
+ window.addEventListener('load',()=>setTimeout(start,1500));
+ setTimeout(start,4000);
+
+ // marquee duplicate
+ const t=$('#track'); t.innerHTML+=t.innerHTML;
+
+ // header, progress, whatsapp, parallax
+ const hdr=$('#hdr'),pr=$('#progress'),wa=$('#wa'),bgB=$('.bgB'),bp=$('.blueprint');
+ const onScroll=()=>{
+  const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
+  hdr.classList.toggle('scrolled',y>40);
+  pr.style.transform=`scaleX(${h>0?y/h:0})`;
+  wa.classList.toggle('show',y>innerHeight*.6);
+  if(bp) bp.style.transform=`translateY(${y*.25}px)`;
+  if(bgB){const r=bgB.parentElement.getBoundingClientRect();bgB.style.transform=`translateY(calc(-50% + ${r.top*-.15}px))`;}
+ };
+ addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+ // menu
+ const b=$('#burger'),m=$('#menu');
+ b.onclick=()=>{m.classList.toggle('open');b.classList.toggle('x')};
+ m.onclick=e=>{if(e.target.closest('a')){m.classList.remove('open');b.classList.remove('x')}};
+
+ // reveal com stagger
+ const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const el=e.target,sib=[...el.parentElement.children].filter(c=>c.classList.contains('rv'));
+  el.style.transitionDelay=Math.max(0,sib.indexOf(el))*0.12+'s';
+  el.classList.add('in'); io.unobserve(el);
+ }),{threshold:.15,rootMargin:'0px 0px -60px 0px'});
+ $$('.rv,.mask,#steps').forEach(el=>io.observe(el));
+
+ // contadores
+ const co=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return; co.unobserve(e.target);
+  const el=e.target,end=+el.dataset.count,suf=el.dataset.suf||'',d=1800,t0=performance.now();
+  const tick=n=>{const p=Math.min(1,(n-t0)/d),v=Math.round(end*(1-Math.pow(1-p,4)));el.textContent=String(v).padStart(end<10?2:1,'0')+suf;if(p<1)requestAnimationFrame(tick)};
+  requestAnimationFrame(tick);
+ }),{threshold:.6});
+ $$('[data-count]').forEach(el=>co.observe(el));
+
+ // menu ativo
+ const secs=$$('section[id]'),links=$$('.menu a[href^="#"]');
+ const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
+ secs.forEach(s=>so.observe(s));
+
+ // filtros
+ $('#filters').onclick=e=>{const bt=e.target.closest('button');if(!bt)return;
+  $$('#filters button').forEach(x=>x.classList.toggle('on',x===bt));
+  $$('#gal .ph').forEach(p=>p.classList.toggle('hide',bt.dataset.f!=='all'&&p.dataset.c!==bt.dataset.f));};
+
+ // faq
+ $$('.q button').forEach(bt=>bt.onclick=()=>{const q=bt.parentElement,o=q.classList.contains('open');$$('.q').forEach(x=>x.classList.remove('open'));if(!o)q.classList.add('open')});
+
+ // formulário -> WhatsApp
+ $('#form').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);
+  const txt=`Olá! Meu nome é ${d.get('nome')}.\nLocal da obra: ${d.get('local')||'-'}\nServiço: ${d.get('tipo')}\n${d.get('msg')||''}`;
+  window.location.href='https://wa.me/5511947257804?text='+encodeURIComponent(txt);};
+
+ $('#toTop').onclick=()=>scrollTo({top:0,behavior:'smooth'});
+})();
+</script>
+</body>
+</html>
